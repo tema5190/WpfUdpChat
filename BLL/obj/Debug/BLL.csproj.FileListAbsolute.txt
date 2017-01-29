@@ -1,0 +1,7 @@
+C:\ITIROD\lab1\BLL\bin\Debug\BLL.dll
+C:\ITIROD\lab1\BLL\bin\Debug\BLL.pdb
+C:\ITIROD\lab1\BLL\obj\Debug\BLL.dll
+C:\ITIROD\lab1\BLL\obj\Debug\BLL.pdb
+C:\ITIROD\lab1\BLL\bin\Debug\Newtonsoft.Json.dll
+C:\ITIROD\lab1\BLL\bin\Debug\Newtonsoft.Json.xml
+C:\ITIROD\lab1\BLL\obj\Debug\BLL.csprojResolveAssemblyReference.cache

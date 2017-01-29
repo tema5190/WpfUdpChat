@@ -1,0 +1,35 @@
+﻿<Window x:Class="lab1.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lab1"
+        mc:Ignorable="d"
+        Title="" Height="400" Width="350" MinHeight="300" MinWidth="300">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Label x:Name="IpLabel" Content="Введите IP адрес" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+            <TextBox x:Name="IpAdressTextBox" TextWrapping="Wrap" Text=""/>
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+            <Label x:Name="RemotePortLabel" Content="Введите порт сервера" HorizontalContentAlignment="Center"/>
+            <TextBox x:Name="RemotePortTextBox" TextWrapping="Wrap"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2">
+            <Label x:Name="LocalPortLabel" Content="Введите свой порт" HorizontalContentAlignment="Center"/>
+            <TextBox x:Name="LocalPortIpAdress" TextWrapping="Wrap"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" VerticalAlignment="Center">
+            <Button x:Name="ToChatWindowButton" Content="Продолжить" Click="ToChatWindowButtonClick" IsDefault="True"/>
+        </StackPanel>
+
+        
+        <!--А это лаба Дерид Артёма, если ты это читаешь, ты либо я, либо препод которому её сдают в который раз...-->
+    </Grid>
+</Window>
