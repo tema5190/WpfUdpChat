@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Sockets;
@@ -12,31 +13,20 @@ namespace BLL.Network
 {
     public class NetworkWorker
     {
+        public List<Message> InputMessages { get; set; } = new List<Message>();
+
         private readonly IPAddress _remoteIpAddress;
         private readonly int _remotePort;
         private readonly int _localPort;
-        private ObservableCollection<Message> chat;
-        private bool isListening;
 
-        public NetworkWorker(ConnectionSetting setting, ObservableCollection<Message> chat)
+        public NetworkWorker(ConnectionSetting setting)
         {
             _remoteIpAddress = setting.ip;
             _remotePort = setting.remotePort;
             _localPort = setting.localPort;
-            this.chat = chat;
 
             Thread listener = new Thread(new ThreadStart(Receiver));
             listener.Start();
-        }
-
-        public void StopListener()
-        {
-            isListening = false;
-        }
-
-        public void StartListening()
-        {
-            isListening = true;
         }
 
         public void Send(Message message)
@@ -52,11 +42,11 @@ namespace BLL.Network
             }
             catch (Exception e)
             {
-                chat.Add(new Message
+                InputMessages.Add(new Message
                 {
                     UserLogin = "system",
                     SendTime = DateTime.Now.ToString(),
-                    MessageText = e.ToString()
+                    MessageText = e.Message
                 });
             }
             finally
@@ -69,34 +59,51 @@ namespace BLL.Network
 
         private void Receiver()
         {
-            var udp = new UdpClient(_localPort);
+            var client = new UdpClient(_localPort);
+            IPEndPoint RemoteIpEndPoint = null;
 
             try
             {
 
-                while (isListening)
+                while (true)
                 {
-                    IPEndPoint ipEndPoint = null;
-                    byte[] inputRowByte = udp.Receive(ref ipEndPoint);
+                    Message resultMessage = new Message();
+                    byte[] inputRowByte = client.Receive(ref RemoteIpEndPoint);
                     var MessageToString = Encoding.Default.GetString(inputRowByte);
-                    Message resultMessage = JsonConvert.DeserializeObject<Message>(MessageToString);
-                    chat.Add(resultMessage);
+                    try
+                    {
+                        resultMessage = JsonConvert.DeserializeObject<Message>(MessageToString);
+                    }
+                    catch (JsonSerializationException e)
+                    {
+                        resultMessage = new Message
+                        {
+                            MessageText = MessageToString,
+                            SendTime = DateTime.MinValue.ToString(),
+                            UserLogin = "Unknow client user"
+                        };
+                    }
+                    finally
+                    {
+                        InputMessages.Add(resultMessage);
+                    }
                 }
             }
+            
             catch (Exception e)
             {
                 var errorMessage = new Message
                 {
                     SendTime = DateTime.Now.ToString(),
                     UserLogin = "system",
-                    MessageText = e.ToString()
+                    MessageText = ""
                 };
 
-                chat.Add(errorMessage);
+                InputMessages.Add(errorMessage);
             }
             finally
             {
-                udp.Close();
+                client.Close();
             }
         }
     }

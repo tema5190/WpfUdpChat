@@ -24,21 +24,42 @@ namespace lab1
         private readonly string _login;
         private bool _isFirstMessage = true;
         public ObservableCollection<Message> Messages { get; set; }
+        public List<Message> InputMessages { get; set; } 
 
         public ChatWindow(ConnectionSetting inputConnectionSetting, string login)
         {
             DataContext = this;
 
             _login = login;
-            network = new NetworkWorker(inputConnectionSetting,Messages);
+
+    
             Messages = new ObservableCollection<Message> {new Message
             {
                 UserLogin = _login,
                 SendTime = DateTime.Now.ToString(),
                 MessageText = _login + " присоединился(лась) к чату!"
             }};
+            StartListening(inputConnectionSetting, Messages);
 
             InitializeComponent();
+        }
+
+        private void StartListening(ConnectionSetting setting, ObservableCollection<Message> messages)
+        {
+            network = new NetworkWorker(setting);
+            InputMessages = network.InputMessages;
+            Thread addnewMessages = new Thread(new ThreadStart(SyncMessages));
+        }
+
+        private void SyncMessages()
+        {
+            while (true)
+            {
+                if (Messages.Count < InputMessages.Count)
+                {
+                    Messages.Add(InputMessages[InputMessages.Count - Messages.Count]);
+                }
+            }
         }
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)

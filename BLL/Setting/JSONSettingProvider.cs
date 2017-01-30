@@ -40,7 +40,7 @@ namespace BLL.Setting
                     return result;
                 }
             }
-            catch (FileNotFoundException)
+            catch (Exception)
             {
                 return null;
             }

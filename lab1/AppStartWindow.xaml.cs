@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Security.Principal;
+using System.Windows;
 
 namespace lab1
 {
