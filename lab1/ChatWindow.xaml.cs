@@ -20,47 +20,117 @@ namespace lab1
     /// </summary>
     public partial class ChatWindow : Window
     {
-        private NetworkWorker network;
         private readonly string _login;
         private bool _isFirstMessage = true;
+        private readonly ConnectionSetting _setting;
+
         public ObservableCollection<Message> Messages { get; set; }
-        public List<Message> InputMessages { get; set; } 
 
         public ChatWindow(ConnectionSetting inputConnectionSetting, string login)
         {
             DataContext = this;
-
             _login = login;
 
-    
-            Messages = new ObservableCollection<Message> {new Message
+            var helloMessage = new Message
             {
                 UserLogin = _login,
                 SendTime = DateTime.Now.ToString(),
                 MessageText = _login + " присоединился(лась) к чату!"
-            }};
-            StartListening(inputConnectionSetting, Messages);
+            };
 
-            InitializeComponent();
+            Messages = new ObservableCollection<Message> {helloMessage};
+            Send(helloMessage);
+
+            Thread thread = new Thread(new ThreadStart(Receiver));
+
         }
 
-        private void StartListening(ConnectionSetting setting, ObservableCollection<Message> messages)
-        {
-            network = new NetworkWorker(setting);
-            InputMessages = network.InputMessages;
-            Thread addnewMessages = new Thread(new ThreadStart(SyncMessages));
-        }
 
-        private void SyncMessages()
+        #region NetworkMethods
+
+        public void Send(Message message)
         {
-            while (true)
+            UdpClient client = new UdpClient();
+            IPEndPoint ipEndPoint = new IPEndPoint(_setting.ip, _setting.remotePort);
+
+            try
             {
-                if (Messages.Count < InputMessages.Count)
+                var JsonMessage = JsonConvert.SerializeObject(message);
+                byte[] rowData = Encoding.UTF8.GetBytes(JsonMessage);
+                client.Send(rowData, rowData.Length, ipEndPoint);
+            }
+            catch (Exception e)
+            {
+                Messages.Add(new Message
                 {
-                    Messages.Add(InputMessages[InputMessages.Count - Messages.Count]);
-                }
+                    UserLogin = "system",
+                    SendTime = DateTime.Now.ToString(),
+                    MessageText = e.Message
+                });
+            }
+            finally
+            {
+                client.Close();
             }
         }
+
+
+        private void Receiver()
+        {
+            var client = new UdpClient(_setting.localPort);
+            IPEndPoint RemoteIpEndPoint = null;
+
+            try
+            {
+
+                while (true)
+                {
+                    Message resultMessage = new Message();
+                    byte[] inputRowByte = client.Receive(ref RemoteIpEndPoint);
+                    var MessageToString = Encoding.Default.GetString(inputRowByte);
+                    try
+                    {
+                        resultMessage = JsonConvert.DeserializeObject<Message>(MessageToString);
+                    }
+                    catch (JsonSerializationException)
+                    {
+                        resultMessage = new Message
+                        {
+                            MessageText = MessageToString,
+                            SendTime = DateTime.MinValue.ToString(),
+                            UserLogin = "Unknow client user"
+                        };
+                    }
+                    finally
+                    {
+                        Messages.Add(resultMessage);
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                var errorMessage = new Message
+                {
+                    SendTime = DateTime.Now.ToString(),
+                    UserLogin = "system",
+                    MessageText = e.Message
+                };
+
+                Messages.Add(errorMessage);
+            }
+            finally
+            {
+                client.Close();
+            }
+
+        }
+
+        #endregion
+
+
+
+            #region WPF methods
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
         {
@@ -85,7 +155,7 @@ namespace lab1
                 MessageText = messageText
             };
             Messages.Add(message);
-            network.Send(message);
+            Send(message);
 
         }
 
@@ -105,7 +175,8 @@ namespace lab1
         {
             Messages.Clear();
         }
+        #endregion
     }
 
-    
+
 }

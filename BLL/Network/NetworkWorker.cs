@@ -74,7 +74,7 @@ namespace BLL.Network
                     {
                         resultMessage = JsonConvert.DeserializeObject<Message>(MessageToString);
                     }
-                    catch (JsonSerializationException e)
+                    catch (JsonSerializationException)
                     {
                         resultMessage = new Message
                         {
