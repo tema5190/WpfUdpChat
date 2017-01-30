@@ -1,4 +1,6 @@
+C:\ITIROD\lab1\lab1\bin\Debug\lab1.exe.config
 C:\ITIROD\lab1\lab1\bin\Debug\lab1.exe
+C:\ITIROD\lab1\lab1\bin\Debug\lab1.pdb
 C:\ITIROD\lab1\lab1\bin\Debug\BLL.dll
 C:\ITIROD\lab1\lab1\bin\Debug\Newtonsoft.Json.dll
 C:\ITIROD\lab1\lab1\bin\Debug\BLL.pdb
@@ -18,5 +20,3 @@ C:\ITIROD\lab1\lab1\obj\Debug\lab1.Properties.Resources.resources
 C:\ITIROD\lab1\lab1\obj\Debug\lab1.csproj.GenerateResource.Cache
 C:\ITIROD\lab1\lab1\obj\Debug\lab1.exe
 C:\ITIROD\lab1\lab1\obj\Debug\lab1.pdb
-C:\ITIROD\lab1\lab1\bin\Debug\lab1.exe.config
-C:\ITIROD\lab1\lab1\bin\Debug\lab1.pdb

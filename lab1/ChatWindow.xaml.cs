@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using BLL.Network;
 using BLL.Setting;
 using Newtonsoft.Json;
@@ -30,6 +26,7 @@ namespace lab1
         {
             DataContext = this;
             _login = login;
+            _setting = inputConnectionSetting;
 
             var helloMessage = new Message
             {
@@ -41,12 +38,24 @@ namespace lab1
             Messages = new ObservableCollection<Message> {helloMessage};
             Send(helloMessage);
 
-            Thread thread = new Thread(new ThreadStart(Receiver));
 
+            Thread thread = new Thread(new ThreadStart(Receiver));
+            Dispatcher.Invoke(new Action(() =>
+            {
+                thread.Start();
+            }));
+
+            InitializeComponent();
         }
 
 
         #region NetworkMethods
+
+        private void Scroll()
+        {
+            var lastIndex = ChatListBox.Items.Count - 1;
+            ChatListBox.ScrollIntoView(ChatListBox.Items[lastIndex]);
+        }
 
         public void Send(Message message)
         {
@@ -78,8 +87,7 @@ namespace lab1
         private void Receiver()
         {
             var client = new UdpClient(_setting.localPort);
-            IPEndPoint RemoteIpEndPoint = null;
-
+            IPEndPoint RemoteIpEndPoint = null; 
             try
             {
 
@@ -87,7 +95,7 @@ namespace lab1
                 {
                     Message resultMessage = new Message();
                     byte[] inputRowByte = client.Receive(ref RemoteIpEndPoint);
-                    var MessageToString = Encoding.Default.GetString(inputRowByte);
+                    var MessageToString = Encoding.UTF8.GetString(inputRowByte);
                     try
                     {
                         resultMessage = JsonConvert.DeserializeObject<Message>(MessageToString);
@@ -103,7 +111,10 @@ namespace lab1
                     }
                     finally
                     {
-                        Messages.Add(resultMessage);
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() => Messages.Add(resultMessage)));
+                        //Messages.Add(resultMessage);
+                        Scroll();
+
                     }
                 }
             }
@@ -116,8 +127,8 @@ namespace lab1
                     UserLogin = "system",
                     MessageText = e.Message
                 };
-
-                Messages.Add(errorMessage);
+                Application.Current.Dispatcher.BeginInvoke(new Action(() => Messages.Add(errorMessage)));
+                //Messages.Add(errorMessage);
             }
             finally
             {
@@ -176,6 +187,11 @@ namespace lab1
             Messages.Clear();
         }
         #endregion
+
+        private void ChatWindow_OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown(0);
+        }
     }
 
 

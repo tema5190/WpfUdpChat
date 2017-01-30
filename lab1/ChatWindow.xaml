@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Запускай гуся работяги!" Height="600" Width="400" MinHeight="500" MinWidth="300" MaxWidth="400" MaxHeight="600">
+        Title="Запускай гуся работяги!" Height="600" Width="400" MinHeight="500" MinWidth="300" MaxWidth="400" MaxHeight="600" Unloaded="ChatWindow_OnUnloaded">
     <Grid Margin="5px">
         <Grid.RowDefinitions>
             <RowDefinition Height="20*"/>
@@ -13,9 +13,10 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="0" ItemsSource="{Binding Messages}"
+        <ListBox Name="ChatListBox"  Grid.Row="0" ItemsSource="{Binding Messages}"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 
                  >
             <ListBox.ItemTemplate>
                 <DataTemplate>

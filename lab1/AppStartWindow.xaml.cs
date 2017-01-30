@@ -18,7 +18,7 @@ namespace lab1
 
         private void ToSettingWindowButtonClick(object sender, RoutedEventArgs e)
         {
-            var login = LoginTextBox.Text;
+            var login = LoginTextBox.Text + "  ";
 
             if(string.IsNullOrWhiteSpace(login) || string.IsNullOrEmpty(login))
             {
